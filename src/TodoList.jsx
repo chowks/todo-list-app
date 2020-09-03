@@ -19,7 +19,6 @@ import {
   Paper,
   TextField,
   Typography,
-  styled,
 } from "@material-ui/core";
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
 import React, { Component } from "react";
@@ -27,10 +26,6 @@ import React, { Component } from "react";
 import EventNoteIcon from "@material-ui/icons/EventNote";
 import { Skeleton } from "@material-ui/lab";
 import localforage from "localforage";
-
-// import { makeStyles, withStyles } from "@material-ui/styles";
-
-// import FlipMove from "react-flip-move";
 
 const LOCAL_STORAGE_KEY = "TODO_LIST";
 
@@ -411,22 +406,5 @@ class TodoList extends Component {
     );
   }
 }
-
-// const useStyles = makeStyles(() => ({
-//   paper: {
-//     background: "yellow",
-//   },
-// }));
-
-// const PaperWithClass = (props) => {
-//   const classes = useStyles();
-//   return <Paper className={classes.paper} {...props} />;
-// };
-
-// const PaperWithStyled = withStyles({
-//   root: {
-//     background: "yellow",
-//   },
-// })(Paper);
 
 export default TodoList;
