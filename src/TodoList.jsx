@@ -7,7 +7,9 @@ import {
   SortByAlpha as SortByAlphaIcon,
 } from "@material-ui/icons";
 import {
+  AppBar,
   Checkbox,
+  Grid,
   IconButton,
   List,
   ListItem,
@@ -17,11 +19,16 @@ import {
   Paper,
   TextField,
   Typography,
+  styled,
 } from "@material-ui/core";
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
 import React, { Component } from "react";
 
+import EventNoteIcon from "@material-ui/icons/EventNote";
+import { Skeleton } from "@material-ui/lab";
 import localforage from "localforage";
+
+// import { makeStyles, withStyles } from "@material-ui/styles";
 
 // import FlipMove from "react-flip-move";
 
@@ -44,14 +51,25 @@ class TodoList extends Component {
     isEditing: {},
     editedValue: "",
     isChecked: {},
+    isLoading: false,
   };
 
   componentDidMount() {
+    this.setState({
+      isLoading: true,
+    });
+
     localforage
       .getItem(LOCAL_STORAGE_KEY)
       .then((list = []) => this.setState({ items: list || [] }))
-      .catch(console.error);
+      .catch(console.error)
+      .finally(() => this.setState({ isLoading: false }));
   }
+
+  handleUpdateIndexDB = () => {
+    const { items } = this.state;
+    localforage.setItem(LOCAL_STORAGE_KEY, items).catch(console.error);
+  };
 
   getItemStyle = (draggableStyle) => ({
     userSelect: "none",
@@ -63,16 +81,14 @@ class TodoList extends Component {
       return;
     }
 
-    const items = reorder(
-      this.state.items,
-      result.source.index,
-      result.destination.index
-    );
-
     this.setState(
-      {
-        items: items,
-      },
+      (prevState) => ({
+        items: reorder(
+          prevState.items,
+          result.source.index,
+          result.destination.index
+        ),
+      }),
       this.handleUpdateIndexDB
     );
   };
@@ -81,11 +97,6 @@ class TodoList extends Component {
     const { name, value } = e.target;
     this.setState({ [name]: value });
     // e.stopPropagation();
-  };
-
-  handleUpdateIndexDB = () => {
-    const { items } = this.state;
-    localforage.setItem(LOCAL_STORAGE_KEY, items).catch(console.error);
   };
 
   handleAddItem = (e) => {
@@ -131,74 +142,6 @@ class TodoList extends Component {
     this.handleSort();
   };
 
-  handleEditTodo = ({ key }) => {
-    this.setState((prevState) => ({
-      isEditing: !prevState.isEditing,
-    }));
-
-    this.setState((prevState) => {
-      const newItems = [...prevState.items];
-      const index = newItems.findIndex((item) => item.key === key);
-      if (index > -1) {
-        newItems[index].text = this.state.editedValue;
-      }
-      return newItems;
-    }, this.handleUpdateIndexDB);
-  };
-
-  handleEditStateChange = (e, { key }) => {
-    this.setState({ isEditing: { [key]: true } });
-  };
-
-  condRender = (item) => {
-    const { isEditing } = this.state;
-    if (isEditing[item.key]) {
-      return (
-        <>
-          <TextField
-            autoFocus
-            label="Edit Task"
-            onChange={(e) => this.editTodoValue(e)}
-            onBlur={() => this.handleEditTodo(item)}
-            variant="outlined"
-            size="small"
-          />
-        </>
-      );
-    }
-    return (
-      <ListItemText
-        primary={item.text}
-        primaryTypographyProps={{
-          className: item.checked ? "lineThrough" : "",
-        }}
-        secondary={item.checked && "Completed !"}
-      />
-    );
-  };
-
-  editTodoValue = (e) => {
-    this.setState({
-      editedValue: e.target.value,
-    });
-  };
-
-  onCheckBox = ({ key }, event) => {
-    this.setState({ isChecked: { [key]: true } });
-
-    const { checked } = event.target;
-
-    this.setState((prevState) => {
-      const newItems = [...prevState.items];
-      const index = newItems.findIndex((item) => item.key === key);
-
-      if (index > -1) {
-        newItems[index].checked = checked;
-      }
-      return newItems;
-    }, this.handleUpdateIndexDB);
-  };
-
   handleSort = () => {
     let { items, isSorted } = this.state;
 
@@ -215,8 +158,76 @@ class TodoList extends Component {
     }
   };
 
+  handleEditStateChange = (e, { key }) => {
+    this.setState({ isEditing: { [key]: true } });
+  };
+
+  editTodoValue = (e) => {
+    this.setState({
+      editedValue: e.target.value,
+    });
+  };
+
+  handleEditTodo = ({ key }, event) => {
+    this.setState((prevState) => {
+      const newItems = [...prevState.items];
+      const index = newItems.findIndex((item) => item.key === key);
+      if (index > -1) {
+        newItems[index].text = this.state.editedValue;
+      }
+      return {
+        items: newItems,
+        isEditing: { [key]: false },
+      };
+    }, this.handleUpdateIndexDB);
+  };
+
+  handleCheckboxChange = ({ key }, event) => {
+    const { checked } = event.target;
+
+    this.setState((prevState) => {
+      const newItems = [...prevState.items];
+      const index = newItems.findIndex((item) => item.key === key);
+
+      if (index > -1) {
+        newItems[index].checked = checked;
+      }
+      return newItems;
+    }, this.handleUpdateIndexDB);
+  };
+
+  renderItem = (item) => {
+    const { isEditing } = this.state;
+    if (isEditing[item.key]) {
+      return (
+        <TextField
+          autoFocus
+          helperText="Please key in todo"
+          label="Edit Task"
+          onChange={(e) => this.editTodoValue(e)}
+          onBlur={(event) => this.handleEditTodo(item, event)}
+          size="small"
+        />
+      );
+    }
+    return (
+      <ListItemText
+        primary={item.text}
+        primaryTypographyProps={{
+          className: item.checked ? "lineThrough" : "",
+        }}
+        secondary={item.checked && "Completed !"}
+      />
+    );
+  };
+
+  renderLoader = () =>
+    [...Array(Math.floor(Math.random() * 11))].map((_, index) => (
+      <Skeleton key={index} height={50} width="100%" />
+    ));
+
   renderItems = () => {
-    let { items } = this.state;
+    let { items, isEditing } = this.state;
     const { keyword } = this.state;
     if (keyword) {
       items = items.filter((item) => item.text.includes(keyword));
@@ -235,17 +246,20 @@ class TodoList extends Component {
               <ListItemIcon>
                 <Checkbox
                   checked={item.checked || false}
-                  onChange={(event) => this.onCheckBox(item, event)}
+                  onChange={(event) => this.handleCheckboxChange(item, event)}
                   color="primary"
                 />
               </ListItemIcon>
-              {this.condRender(item)}
-              <ListItemSecondaryAction>
-                <IconButton
-                  onClick={(e) => this.handleEditStateChange(e, item)}
-                >
-                  <EditIcon />
-                </IconButton>
+              {this.renderItem(item)}
+              <ListItemSecondaryAction className="iconSpacing">
+                {!isEditing[item.key] && (
+                  <IconButton
+                    onClick={(e) => this.handleEditStateChange(e, item)}
+                    className="iconSpacing"
+                  >
+                    <EditIcon />
+                  </IconButton>
+                )}
                 <IconButton onClick={() => this.handleDeleteItem(item)}>
                   <DeleteIcon />
                 </IconButton>
@@ -258,62 +272,161 @@ class TodoList extends Component {
   };
 
   render() {
-    const { taskValue } = this.state;
+    const { taskValue, isLoading, items } = this.state;
+
+    let getItemLength = items.length;
+
+    let date = new Date();
+    let get = ("0" + date.getDate()).slice(-2);
+
+    let days = [
+      "Sunday",
+      "Monday",
+      "Tuesday",
+      "Wednesday",
+      "Thursday",
+      "Friday",
+      "Saturday",
+    ];
+
+    let months = [
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December",
+    ];
+
+    var getDays = days[date.getDay()];
+    var getMonths = months[date.getMonth()];
+    var getYears = date.getFullYear();
+
     return (
-      <Paper className="paper">
-        <div className="todoListMain">
-          <Typography variant="body2" className="title">
-            To Do List App
-          </Typography>
-          <div className="header">
-            <form onSubmit={(e) => this.handleAddItem(e)}>
-              <TextField
-                label="Enter Task"
-                margin="dense"
-                name="taskValue"
-                onChange={this.handleInputChange}
-                value={taskValue}
-                variant="outlined"
-              />
-              <IconButton type="submit" color="primary" className="squareBtn">
-                <AddIcon style={{ fontSize: "1rem" }} />
-              </IconButton>
-            </form>
-            <IconButton
-              onClick={this.handleToggleSort}
-              type="submit"
-              color="primary"
-              className="squareBtn"
+      <Paper>
+        <AppBar className="appBarStyle" position="static">
+          <Grid container justify="center" alignItems="center">
+            <Grid item xs>
+              <Typography variant="h6" className="title">
+                To Do List App
+              </Typography>
+            </Grid>
+            <Grid item xs={4}></Grid>
+            <Grid item xs className="iconAlign">
+              <EventNoteIcon style={{ fontSize: "1.25rem" }} />
+            </Grid>
+          </Grid>
+        </AppBar>
+        <Paper className="paper">
+          <div className="todoListMain">
+            <Grid
+              container
+              spacing={1}
+              justify="center"
+              alignItems="center"
+              className="gridMargin"
             >
-              <SortByAlphaIcon style={{ fontSize: "1rem" }} />
-            </IconButton>
+              <Grid item xs>
+                <Typography variant="h6" className="dayToday">
+                  {get}
+                </Typography>
+              </Grid>
+              <Grid container item xs={8} direction="column">
+                <Grid item xs>
+                  <Typography
+                    variant="body2"
+                    className="getDays"
+                    justify="flex-end"
+                  >
+                    {getDays}
+                  </Typography>
+                </Grid>
+                <Grid item xs>
+                  <Typography variant="caption" className="getYears">
+                    {getMonths}, {getYears}
+                  </Typography>
+                </Grid>
+              </Grid>
+
+              <Grid item xs>
+                <Typography variant="caption" className="iconAlign">
+                  {getItemLength} Task
+                </Typography>
+              </Grid>
+            </Grid>
+            <div className="header">
+              <form onSubmit={(e) => this.handleAddItem(e)}>
+                <TextField
+                  label="Enter Task"
+                  margin="dense"
+                  name="taskValue"
+                  onChange={this.handleInputChange}
+                  value={taskValue}
+                  variant="outlined"
+                />
+                <IconButton type="submit" className="squareBtn addIcon">
+                  <AddIcon style={{ fontSize: "1rem" }} />
+                </IconButton>
+              </form>
+
+              <IconButton
+                onClick={this.handleToggleSort}
+                type="submit"
+                color="primary"
+                className="squareBtn sortIcon"
+              >
+                <SortByAlphaIcon style={{ fontSize: "1rem" }} />
+              </IconButton>
+            </div>
+
+            <DragDropContext onDragEnd={this.handleOnDragEnd}>
+              <Droppable droppableId="droppable">
+                {(provided) => (
+                  <List {...provided.droppableProps} ref={provided.innerRef}>
+                    {provided.placeholder}
+                    <ul className="theList">
+                      {isLoading ? this.renderLoader() : this.renderItems()}
+                    </ul>
+                  </List>
+                )}
+              </Droppable>
+            </DragDropContext>
+            <TextField
+              label="Search Task"
+              margin="dense"
+              name="keyword"
+              onChange={this.handleInputChange}
+              variant="outlined"
+              className="searchBar"
+            />
           </div>
-          <DragDropContext onDragEnd={(result) => this.handleOnDragEnd(result)}>
-            <Droppable droppableId="droppable">
-              {(provided) => (
-                <List {...provided.droppableProps} ref={provided.innerRef}>
-                  {provided.placeholder}
-                  <ul className="theList">
-                    {/* <FlipMove duration={250} easing="ease-out"> */}
-                    {this.renderItems()}
-                    {/* </FlipMove> */}
-                  </ul>
-                </List>
-              )}
-            </Droppable>
-          </DragDropContext>
-          <TextField
-            label="Search Task"
-            margin="dense"
-            name="keyword"
-            onChange={this.handleInputChange}
-            variant="outlined"
-            className="searchBar"
-          />
-        </div>
+        </Paper>
       </Paper>
     );
   }
 }
+
+// const useStyles = makeStyles(() => ({
+//   paper: {
+//     background: "yellow",
+//   },
+// }));
+
+// const PaperWithClass = (props) => {
+//   const classes = useStyles();
+//   return <Paper className={classes.paper} {...props} />;
+// };
+
+// const PaperWithStyled = withStyles({
+//   root: {
+//     background: "yellow",
+//   },
+// })(Paper);
 
 export default TodoList;

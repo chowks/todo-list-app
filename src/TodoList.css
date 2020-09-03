@@ -1,9 +1,14 @@
+.header {
+  text-align: center;
+}
+
 .searchBar {
   min-width: 100% !important;
 }
 
 .squareBtn {
   border-radius: 3px !important;
+  text-align: right;
 }
 
 .todoListMain .header input {
@@ -16,21 +21,21 @@
 .todoListMain .header form button {
   padding: 10px;
   font-size: 16px;
-  margin: 10px;
+  margin-left: 20px;
   margin-right: 0px;
-  background-color: green;
   color: #fff;
-  border: 2px solid green;
+  border: 2px solid #fc6e20;
 }
 .todoListMain .header form button:hover {
-  background-color: darkgreen;
-  border: 2px solid darkgreen;
+  background-color: #bb5017;
+  border: 2px solid #d45e1e;
   cursor: pointer;
+  transition: all 0.5s;
 }
 
 .todoListMain .header button:hover {
-  background-color: #003399;
-  border: 2px solid #003399;
+  background-color: black;
+  border: 2px solid #4b4a4a;
   cursor: pointer;
 }
 
@@ -75,9 +80,8 @@ form {
   font-size: 16px;
   margin: 10px;
   margin-right: 0px;
-  background-color: #0066ff;
   color: #fff;
-  border: 2px solid #0066ff;
+  border: 2px solid #323232;
 }
 
 .lineThrough {
@@ -85,10 +89,56 @@ form {
 }
 
 .paper {
-  padding: 47px;
+  padding: 30px 47px 47px 47px;
   min-width: 300px;
+  border-radius: 0 0 3px 3px !important;
 }
 
 .title {
-  margin-bottom: 1em !important;
+  font-size: 14px !important;
+}
+
+.headerPaper {
+  background: black !important;
+}
+
+.appBarStyle {
+  height: auto;
+  padding: 20px 47px;
+  background: #323232 !important;
+  border-radius: 3px 3px 0 0 !important;
+}
+
+.dayToday {
+  font-weight: bold !important;
+  font-size: 2.5rem !important;
+  color: #fc6e20;
+}
+
+.getDays {
+  color: #696969;
+}
+
+.getYears {
+  color: #a3a3a3;
+}
+
+.gridMargin {
+  margin-bottom: 25px !important;
+}
+
+.iconAlign {
+  text-align: right;
+}
+
+.addIcon {
+  background: #fc6e20 !important;
+}
+
+.sortIcon {
+  background: #323232 !important;
+}
+
+.iconSpacing {
+  right: 0 !important;
 }
