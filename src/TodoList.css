@@ -223,3 +223,7 @@ li .MuiListItemSecondaryAction-root {
 .editIcon {
   margin-right: 13px !important;
 }
+
+form .MuiFormControl-marginDense {
+  margin-top: 4px !important;
+}
