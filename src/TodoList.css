@@ -1,112 +1,96 @@
-.header {
-  text-align: center;
+@media only screen and (max-width: 600px) {
+  .appBarStyle {
+    padding: 20px 20px !important;
+  }
+
+  .paper {
+    padding: 30px 30px 0px 30px !important;
+  }
+
+  .textInput {
+    width: 62% !important;
+  }
+
+  .searchBar {
+    width: 60%;
+  }
+  li .MuiListItemSecondaryAction-root {
+    right: 0;
+  }
+  .MuiListItemIcon-root {
+    min-width: 0 !important;
+  }
 }
 
-.searchBar {
-  min-width: 100% !important;
+@media only screen and (max-width: 320px) {
+  .title {
+    font-size: 13px !important;
+  }
+
+  .searchIcon {
+    font-size: 20px !important;
+  }
+
+  .textInput .MuiFormLabel-root {
+    font-size: 12px;
+    line-height: 1.1876em;
+  }
+
+  form .MuiFormControl-root {
+    margin-right: 7px !important;
+  }
+
+  li .MuiListItemSecondaryAction-root {
+    right: 0;
+  }
+
+  .iconSpacing .MuiIconButton-root {
+    margin-right: 0 !important;
+  }
 }
 
-.squareBtn {
-  border-radius: 3px !important;
-  text-align: right;
-}
-
-.todoListMain .header input {
-  padding: 10px;
-  font-size: 16px;
-  border-radius: 4px;
-  border: 2px solid #fff;
-  width: 165px;
-}
-.todoListMain .header form button {
-  padding: 10px;
-  font-size: 16px;
-  margin-left: 20px;
-  margin-right: 0px;
-  color: #fff;
-  border: 2px solid #fc6e20;
-}
-.todoListMain .header form button:hover {
-  background-color: #bb5017;
-  border: 2px solid #d45e1e;
-  cursor: pointer;
-  transition: all 0.5s;
-}
-
-.todoListMain .header button:hover {
-  background-color: black;
-  border: 2px solid #4b4a4a;
-  cursor: pointer;
-}
-
-.todoListMain .theList {
-  list-style: none;
-  padding-left: 0;
-  width: 100%;
-}
-.todoListMain .theList li {
-  color: #333;
-  background-color: rgba(255, 255, 255, 0.5);
-  padding: 6px;
-  margin-bottom: 15px;
-  border-radius: 5px;
-  list-style: none;
-}
-ul.theList {
-  padding: 0;
-}
-
-.todoListMain .theList li {
-  color: #333;
-  background-color: rgba(255, 255, 255, 0.5);
-  padding: 6px;
-  margin-bottom: 15px;
-  border-radius: 5px;
-
-  transition: background-color 0.2s ease-out;
-}
-
-.todoListMain .theList li:hover {
-  background-color: #66ccff69;
-  cursor: pointer;
-}
-
-form {
-  display: inline-block;
-}
-
-.todoListMain .header button {
-  padding: 10px;
-  font-size: 16px;
-  margin: 10px;
-  margin-right: 0px;
-  color: #fff;
-  border: 2px solid #323232;
-}
-
-.lineThrough {
-  text-decoration: line-through;
+@media only screen and (max-width: 415px) and (min-width: 376px) {
+  form .MuiFormControl-root {
+    margin-right: 36px !important;
+  }
 }
 
 .paper {
-  padding: 30px 47px 47px 47px;
-  min-width: 300px;
+  padding: 30px 47px 30px 47px;
+  width: 100%;
   border-radius: 0 0 3px 3px !important;
 }
 
-.title {
-  font-size: 14px !important;
-}
-
-.headerPaper {
-  background: black !important;
-}
-
 .appBarStyle {
-  height: auto;
   padding: 20px 47px;
   background: #323232 !important;
   border-radius: 3px 3px 0 0 !important;
+  height: 90px;
+}
+
+.headerTop .MuiTypography-body1 {
+  font-size: 16px;
+  font-weight: bold !important;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.block1 {
+  margin-bottom: 20px !important;
+  margin-top: 10px !important;
+}
+
+.headerIcon {
+  vertical-align: middle;
+  padding: 8px 8px 8px 0;
+}
+
+.text-right {
+  text-align: right !important;
+}
+
+.searchIcon {
+  color: white;
 }
 
 .dayToday {
@@ -117,28 +101,125 @@ form {
 
 .getDays {
   color: #696969;
+  line-height: 1 !important;
 }
 
 .getYears {
   color: #a3a3a3;
-}
-
-.gridMargin {
-  margin-bottom: 25px !important;
-}
-
-.iconAlign {
-  text-align: right;
+  line-height: 1 !important;
 }
 
 .addIcon {
   background: #fc6e20 !important;
+  padding: 10px;
+  font-size: 16px;
+  margin-left: 20px;
+  margin-right: 0px;
+  color: #fff !important;
+  border: 3px solid #fc6e20;
+  border-radius: 3px !important;
+  display: inline-block;
+  vertical-align: middle !important;
+}
+
+.lineThrough {
+  text-decoration: line-through;
+}
+
+.addIcon:hover {
+  background-color: #bb5017;
+  border-color: #d45e1e;
+  cursor: pointer;
+  transition: all 0.5s;
 }
 
 .sortIcon {
   background: #323232 !important;
+  padding: 10px;
+  font-size: 16px;
+  margin: 10px;
+  margin-right: 0px;
+  color: #fff !important;
+  border: 3px solid #323232;
+  border-radius: 3px !important;
 }
 
-.iconSpacing {
-  right: 0 !important;
+.sortIcon:hover {
+  background-color: black;
+  border-color: #4b4a4a;
+  cursor: pointer;
+}
+
+.theList {
+  list-style: none;
+  width: 100%;
+  padding: 0;
+}
+
+.theList li {
+  color: #333;
+  background-color: rgba(255, 255, 255, 0.5);
+  padding: 6px;
+  margin-bottom: 15px;
+  border-radius: 5px;
+  list-style: none;
+  transition: background-color 0.2s ease-out;
+}
+
+ul {
+  width: 100%;
+}
+
+.theList li:hover {
+  background-color: #66ccff69;
+  cursor: pointer;
+}
+
+form .MuiFormControl-root {
+  width: 85%;
+  margin-right: 20px;
+  vertical-align: middle !important;
+}
+
+form {
+  width: 100%;
+}
+
+.grid-spacing {
+  margin-bottom: 20px;
+}
+
+.searchBtn {
+  display: inline-block;
+}
+
+.searchBar .MuiInputLabel-root {
+  color: rgba(255, 255, 255, 0.5) !important;
+}
+.searchBar .MuiInput-input {
+  color: white !important;
+}
+
+.searchBar .MuiInput-underline:after {
+  border-bottom: 2px solid white !important;
+}
+
+.searchBar .MuiInput-underline:before {
+  border-bottom: 1px solid white;
+}
+
+.searchBar .MuiInput-underline:hover:not(.Mui-disabled):before {
+  border-bottom: 2px solid white;
+}
+
+.iconSpacing .MuiIconButton-root {
+  padding: 8px;
+}
+
+li .MuiListItemSecondaryAction-root {
+  right: 6px;
+}
+
+.editIcon {
+  margin-right: 13px !important;
 }

@@ -2,13 +2,18 @@ import "./TodoList.css";
 
 import {
   Add as AddIcon,
+  Close,
   Delete as DeleteIcon,
+  DragIndicator as DragIcon,
   Edit as EditIcon,
+  ListAlt as ListIcon,
+  Search,
   SortByAlpha as SortByAlphaIcon,
 } from "@material-ui/icons";
 import {
   AppBar,
   Checkbox,
+  Fade,
   Grid,
   IconButton,
   List,
@@ -23,7 +28,6 @@ import {
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
 import React, { Component } from "react";
 
-import EventNoteIcon from "@material-ui/icons/EventNote";
 import { Skeleton } from "@material-ui/lab";
 import localforage from "localforage";
 
@@ -47,6 +51,7 @@ class TodoList extends Component {
     editedValue: "",
     isChecked: {},
     isLoading: false,
+    isSearching: undefined,
   };
 
   componentDidMount() {
@@ -158,9 +163,11 @@ class TodoList extends Component {
   };
 
   editTodoValue = (e) => {
-    this.setState({
-      editedValue: e.target.value,
-    });
+    if (e.target.value !== "") {
+      this.setState({
+        editedValue: e.target.value,
+      });
+    }
   };
 
   handleEditTodo = ({ key }, event) => {
@@ -169,6 +176,7 @@ class TodoList extends Component {
       const index = newItems.findIndex((item) => item.key === key);
       if (index > -1) {
         newItems[index].text = this.state.editedValue;
+        console.log(newItems);
       }
       return {
         items: newItems,
@@ -191,6 +199,12 @@ class TodoList extends Component {
     }, this.handleUpdateIndexDB);
   };
 
+  handleSearchCheck = () => {
+    this.setState((prevState) => ({
+      isSearching: !prevState.isSearching,
+    }));
+  };
+
   renderItem = (item) => {
     const { isEditing } = this.state;
     if (isEditing[item.key]) {
@@ -202,6 +216,7 @@ class TodoList extends Component {
           onChange={(e) => this.editTodoValue(e)}
           onBlur={(event) => this.handleEditTodo(item, event)}
           size="small"
+          required
         />
       );
     }
@@ -211,7 +226,7 @@ class TodoList extends Component {
         primaryTypographyProps={{
           className: item.checked ? "lineThrough" : "",
         }}
-        secondary={item.checked && "Completed !"}
+        // secondary={item.checked && "Completed !"}
       />
     );
   };
@@ -239,10 +254,14 @@ class TodoList extends Component {
           >
             <ListItem disableGutters key={item.key}>
               <ListItemIcon>
+                <DragIcon size="small" color="disabled" />
+              </ListItemIcon>
+              <ListItemIcon>
                 <Checkbox
                   checked={item.checked || false}
                   onChange={(event) => this.handleCheckboxChange(item, event)}
                   color="primary"
+                  size="small"
                 />
               </ListItemIcon>
               {this.renderItem(item)}
@@ -250,13 +269,13 @@ class TodoList extends Component {
                 {!isEditing[item.key] && (
                   <IconButton
                     onClick={(e) => this.handleEditStateChange(e, item)}
-                    className="iconSpacing"
+                    className="iconSpacing editIcon"
                   >
-                    <EditIcon />
+                    <EditIcon fontSize="small" />
                   </IconButton>
                 )}
                 <IconButton onClick={() => this.handleDeleteItem(item)}>
-                  <DeleteIcon />
+                  <DeleteIcon fontSize="small" />
                 </IconButton>
               </ListItemSecondaryAction>
             </ListItem>
@@ -267,7 +286,7 @@ class TodoList extends Component {
   };
 
   render() {
-    const { taskValue, isLoading, items } = this.state;
+    const { taskValue, isLoading, items, isSearching } = this.state;
 
     let getItemLength = items.length;
 
@@ -299,40 +318,81 @@ class TodoList extends Component {
       "December",
     ];
 
-    var getDays = days[date.getDay()];
-    var getMonths = months[date.getMonth()];
-    var getYears = date.getFullYear();
-
+    let getDays = days[date.getDay()];
+    let getMonths = months[date.getMonth()];
+    let getYears = date.getFullYear();
     return (
-      <Paper>
-        <AppBar className="appBarStyle" position="static">
+      <Grid container justify="center" alignItems="center">
+        <AppBar position="static" className="appBarStyle">
           <Grid container justify="center" alignItems="center">
-            <Grid item xs>
-              <Typography variant="h6" className="title">
-                To Do List App
-              </Typography>
+            <Grid item xs={5} md={5} className="headerTop">
+              <ListIcon
+                style={{ fontSize: "1.25rem" }}
+                className="headerIcon"
+              />
+              <Typography className="title">To Do List</Typography>
             </Grid>
-            <Grid item xs={4}></Grid>
-            <Grid item xs className="iconAlign">
-              <EventNoteIcon style={{ fontSize: "1.25rem" }} />
+            <Grid item xs={7} md={7} className="text-right">
+              <Grid item xs>
+                {isSearching && (
+                  <Fade in>
+                    <TextField
+                      label="Search"
+                      // margin="dense"
+                      name="keyword"
+                      onChange={this.handleInputChange}
+                      // variant="outlined"
+                      className="searchBar"
+                      autoFocus
+                      onBlur={this.handleSearchCheck}
+                    />
+                  </Fade>
+                )}
+
+                {isSearching ? (
+                  <Fade in>
+                    <IconButton
+                      onClick={this.handleSearchCheck}
+                      className="searchBtn"
+                    >
+                      <Close className="searchIcon" />
+                    </IconButton>
+                  </Fade>
+                ) : (
+                  <Fade in>
+                    <IconButton
+                      onClick={this.handleSearchCheck}
+                      className="searchBtn"
+                    >
+                      <Search className="searchIcon" />
+                    </IconButton>
+                  </Fade>
+                )}
+              </Grid>
+              {/* <Grid item xs></Grid> */}
             </Grid>
           </Grid>
         </AppBar>
-        <Paper className="paper">
-          <div className="todoListMain">
+        <Grid
+          container
+          justify="center"
+          alignItems="center"
+          className="grid-padding"
+        >
+          <Paper className="paper">
             <Grid
               container
               spacing={1}
-              justify="center"
+              justify="flex-start"
               alignItems="center"
-              className="gridMargin"
+              className="block1"
             >
-              <Grid item xs>
+              <Grid item xs="auto" md>
                 <Typography variant="h6" className="dayToday">
                   {get}
                 </Typography>
               </Grid>
-              <Grid container item xs={8} direction="column">
+              <Grid container item xs={6} md={9} direction="column">
                 <Grid item xs>
                   <Typography
                     variant="body2"
@@ -342,67 +402,68 @@ class TodoList extends Component {
                     {getDays}
                   </Typography>
                 </Grid>
-                <Grid item xs>
+                <Grid item xs="auto">
                   <Typography variant="caption" className="getYears">
                     {getMonths}, {getYears}
                   </Typography>
                 </Grid>
               </Grid>
 
-              <Grid item xs>
-                <Typography variant="caption" className="iconAlign">
-                  {getItemLength} Task
-                </Typography>
+              <Grid item xs={3} md className="text-right">
+                <Typography variant="caption">{getItemLength} Tasks</Typography>
               </Grid>
             </Grid>
-            <div className="header">
-              <form onSubmit={(e) => this.handleAddItem(e)}>
-                <TextField
-                  label="Enter Task"
-                  margin="dense"
-                  name="taskValue"
-                  onChange={this.handleInputChange}
-                  value={taskValue}
-                  variant="outlined"
-                />
-                <IconButton type="submit" className="squareBtn addIcon">
-                  <AddIcon style={{ fontSize: "1rem" }} />
+            <Grid
+              container
+              justify="center"
+              alignItems="center"
+              className="grid-spacing"
+            >
+              <Grid container item xs={11} md={11}>
+                <form onSubmit={(e) => this.handleAddItem(e)}>
+                  <TextField
+                    label="Enter Task"
+                    margin="dense"
+                    name="taskValue"
+                    onChange={this.handleInputChange}
+                    value={taskValue}
+                    variant="outlined"
+                    className="textInput"
+                    required
+                  />
+                  <IconButton type="submit" className="addIcon">
+                    <AddIcon style={{ fontSize: "1rem" }} />
+                  </IconButton>
+                </form>
+              </Grid>
+              <Grid container item xs={1} md={1} justify="flex-end">
+                <IconButton
+                  onClick={this.handleToggleSort}
+                  type="submit"
+                  color="primary"
+                  className="sortIcon"
+                >
+                  <SortByAlphaIcon style={{ fontSize: "1rem" }} />
                 </IconButton>
-              </form>
-
-              <IconButton
-                onClick={this.handleToggleSort}
-                type="submit"
-                color="primary"
-                className="squareBtn sortIcon"
-              >
-                <SortByAlphaIcon style={{ fontSize: "1rem" }} />
-              </IconButton>
-            </div>
-
-            <DragDropContext onDragEnd={this.handleOnDragEnd}>
-              <Droppable droppableId="droppable">
-                {(provided) => (
-                  <List {...provided.droppableProps} ref={provided.innerRef}>
-                    {provided.placeholder}
-                    <ul className="theList">
-                      {isLoading ? this.renderLoader() : this.renderItems()}
-                    </ul>
-                  </List>
-                )}
-              </Droppable>
-            </DragDropContext>
-            <TextField
-              label="Search Task"
-              margin="dense"
-              name="keyword"
-              onChange={this.handleInputChange}
-              variant="outlined"
-              className="searchBar"
-            />
-          </div>
-        </Paper>
-      </Paper>
+              </Grid>
+            </Grid>
+            <Grid container item xs={12} md={12}>
+              <DragDropContext onDragEnd={this.handleOnDragEnd}>
+                <Droppable droppableId="droppable">
+                  {(provided) => (
+                    <List {...provided.droppableProps} ref={provided.innerRef}>
+                      {provided.placeholder}
+                      <ul className="theList">
+                        {isLoading ? this.renderLoader() : this.renderItems()}
+                      </ul>
+                    </List>
+                  )}
+                </Droppable>
+              </DragDropContext>
+            </Grid>
+          </Paper>
+        </Grid>
+      </Grid>
     );
   }
 }
