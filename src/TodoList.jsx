@@ -45,7 +45,7 @@ class TodoList extends Component {
   state = {
     items: [],
     keyword: "",
-    isSorted: undefined,
+    isSorted: Boolean,
     taskValue: "",
     isEditing: {},
     editedValue: "",
@@ -137,7 +137,8 @@ class TodoList extends Component {
       (prevState) => ({
         isSorted: !prevState.isSorted,
       }),
-      this.handleUpdateIndexDB
+      this.handleUpdateIndexDB,
+      console.log(this.state.isSorted)
     );
     this.handleSort();
   };
@@ -171,18 +172,26 @@ class TodoList extends Component {
   };
 
   handleEditTodo = ({ key }, event) => {
-    this.setState((prevState) => {
-      const newItems = [...prevState.items];
-      const index = newItems.findIndex((item) => item.key === key);
-      if (index > -1) {
-        newItems[index].text = this.state.editedValue;
-        console.log(newItems);
-      }
-      return {
-        items: newItems,
-        isEditing: { [key]: false },
-      };
-    }, this.handleUpdateIndexDB);
+    this.setState(
+      (prevState) => {
+        const newItems = [...prevState.items];
+        const index = newItems.findIndex((item) => item.key === key);
+        console.log(this.state.editedValue);
+        if (this.state.editedValue !== "") {
+          if (index > -1) {
+            newItems[index].text = this.state.editedValue;
+          }
+        }
+
+        return {
+          items: newItems,
+          isEditing: { [key]: false },
+          editedValue: "",
+        };
+      },
+
+      this.handleUpdateIndexDB
+    );
   };
 
   handleCheckboxChange = ({ key }, event) => {
@@ -216,7 +225,6 @@ class TodoList extends Component {
           onChange={(e) => this.editTodoValue(e)}
           onBlur={(event) => this.handleEditTodo(item, event)}
           size="small"
-          required
         />
       );
     }
